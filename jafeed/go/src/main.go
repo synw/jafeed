@@ -11,10 +11,14 @@ import (
 	"strings"
 	"bufio"
 	"os"
+	"time"
 )
+
+
 
 type FeedEntry struct {
 	Id string `gorethink:"id,omitempty"`
+	Timestamp int64
 	Feed string
 	Url string
 	Title string
@@ -80,6 +84,7 @@ func parseitems(feed *gofeed.Feed, items []*gofeed.Item, c chan string) string {
 		hasher := md5.New()
 		hasher.Write([]byte(idstr))
 		feeddata.Id = hex.EncodeToString(hasher.Sum(nil))
+		feeddata.Timestamp = time.Now().UnixNano()
 		feeddata.Feed = feed.Link
 		feeddata.Title = item.Title
 		feeddata.Content = item.Content
