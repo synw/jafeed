@@ -1,6 +1,7 @@
 # Jafeed
 
-Rss and atom feeds agregator using Rethinkdb for the storage, Django for the UI and a Go module for the aggregation.
+Rss and atom feeds agregator using Rethinkdb for the storage, Django for the UI and a Go module for the aggregation
+engine.
 
 ## Dependencies
 
@@ -8,6 +9,8 @@ Rss and atom feeds agregator using Rethinkdb for the storage, Django for the UI 
 - [Django](https://github.com/django/django) and [django-changefeed](https://github.com/synw/django-changefeed)
 
 ## Install
+
+Clone the repo and `pip install rethinkdb`
 
 #### Database:
 
