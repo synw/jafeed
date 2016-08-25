@@ -9,19 +9,20 @@ Rss and atom feeds agregator using Rethinkdb for the storage, Django for the UI 
 
 ## Install
 
-1. Database:
+#### Database:
 
 Create a `jafeed` database with a `feeds` table in Rethinkdb. Add a `Timestamp` secondary index to this table.
 
-2. Django
+#### Django
 
 Add `"changefeed",` and `"jafeed",` to INSTALLED_APPS
 
 Add `url(r'^jafeed/', include('jafeed.urls')),` to urls.py
 
-3. The Go module
+#### The Go module
 
-Put the url of your domain in `jafeed/go/jafeed.config`. Default is set to `http://localhost:8000`.
+Put the url of your domain in `jafeed/go/jafeed.config`. Default is set to `http://localhost:8000`. This is used by
+the go worker to retrieve the feeds list from Django.
 
 Set a cronjob for `jafeed/go/jafeed` that will retrieve the feeds.
 
