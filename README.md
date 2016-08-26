@@ -23,7 +23,7 @@ Add `"changefeed",` and `"jafeed",` to INSTALLED_APPS
 
 Add `url(r'^jafeed/', include('jafeed.urls')),` to urls.py
 
-Make the migrations and run them.
+Run the migrations.
 
 #### The Go module
 
@@ -38,8 +38,18 @@ Create some feeds in the Django admin and run `jafeed/go/jafeed` to retrieve the
 
 Go to `/jafeed/` and see your feeds.
 
+## Realtime notifications
+
+Install [django-instant](https://github.com/synw/django-instant) and 
+[Centrifugo](https://github.com/centrifugal/centrifugo)
+
+Add a template ``instant/extra_handlers.js`` with this content:
+
+  ```django
+{% include "jafeed/js/handlers.js" %}
+  ```
+
 ## Todo
 
-- Changefeeds realtime notifications
 - Categories
 - More configuration info to use for the go worker

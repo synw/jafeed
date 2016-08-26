@@ -1,0 +1,16 @@
+{% load i18n %}
+<style>
+#jafeed_widget {
+	display:none;
+	font-size:130%;
+	margin-top:1em;
+	padding:0.5em;
+}
+</style>
+<div id="jafeed_widget">
+	<span id="jafeed_num_posts" class="label label-primary" style="font-weight:bold;font-size:110%">0</span> 
+	{% trans "new posts available" %} 
+	<a href="javascript:self.location.reload()" class="btn btn-default">
+		<i class="fa fa-refresh" style="font-size:110%"></i> {% trans "Refresh" %}
+	</a>
+</div>

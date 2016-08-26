@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import rethinkdb as r
+from instant import broadcast
 
 
 def feed_handlers(database, table, change):
-    print "Jafeed handler ->"
-    print 'DB: '+str(database)
-    print 'Table: '+str(table)
-    print 'Old values: '+str(change['old_val'])
-    print 'New values: '+str(change['new_val'])
+    _type = change["type"]
+    if _type == "add":
+        print "Jafeed handler ->"
+        print ".. broadcasting message"
+        broadcast(message='Update', event_class="__jafeed__")
     return
 
 def r_query():
-    return r.db("jafeed").table("feeds").changes()
+    return r.db("jafeed").table("feeds").changes(include_types=True)
