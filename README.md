@@ -11,6 +11,7 @@ engine.
 ## Install
 
 Clone the repo and `pip install rethinkdb`
+and [install django-changefeed](http://django-changefeed.readthedocs.io/en/latest/src/install.html)
 
 #### Database:
 
@@ -21,6 +22,8 @@ Create a `jafeed` database with a `feeds` table in Rethinkdb. Add a `Timestamp` 
 Add `"changefeed",` and `"jafeed",` to INSTALLED_APPS
 
 Add `url(r'^jafeed/', include('jafeed.urls')),` to urls.py
+
+Make the migrations and run them.
 
 #### The Go module
 
