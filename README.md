@@ -54,7 +54,7 @@ Create a template ``instant/extra_handlers.js`` with this content:
 Add the counter widget in your templates where you want it:
 
   ```django
-{% include "jafeed/js/handlers.js" %}
+{% include "jafeed/widget.html" %}
   ```
 
 ## Todo
