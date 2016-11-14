@@ -2,7 +2,7 @@
 
 from django.views.generic import TemplateView
 from rethinkdb import r
-from changefeed.orm import R
+from djR.r_producers import R
 from jafeed.models import Feed
 
 

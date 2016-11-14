@@ -11,7 +11,7 @@ engine.
 ## Install
 
 Clone the repo and `pip install rethinkdb`
-and [install django-changefeed](http://django-changefeed.readthedocs.io/en/latest/src/install.html)
+and [install django-R](https://github.com/synw/django-R)
 
 #### Database:
 
@@ -19,7 +19,7 @@ Create a `jafeed` database with a `feeds` table in Rethinkdb. Add a `Timestamp` 
 
 #### Django
 
-Add `"changefeed",` and `"jafeed",` to INSTALLED_APPS
+Add `"jafeed",` to INSTALLED_APPS
 
 Add `url(r'^jafeed/', include('jafeed.urls')),` to urls.py
 
@@ -37,25 +37,6 @@ Set a cronjob for `jafeed/go/jafeed` that will retrieve the feeds.
 Create some feeds in the Django admin and run `jafeed/go/jafeed` to retrieve the data and store it in the database.
 
 Go to `/jafeed/` and see your feeds.
-
-## Realtime notifications
-
-Displays a widget that notifies the number of new posts to the user.
-
-Install [django-instant](https://github.com/synw/django-instant) and 
-[Centrifugo](https://github.com/centrifugal/centrifugo)
-
-Create a template ``instant/extra_handlers.js`` with this content:
-
-  ```django
-{% include "jafeed/js/handlers.js" %}
-  ```
-
-Add the counter widget in your templates where you want it:
-
-  ```django
-{% include "jafeed/widget.html" %}
-  ```
 
 ## Todo
 

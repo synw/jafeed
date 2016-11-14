@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import rethinkdb as r
-from instant import broadcast
+from instant.producers import broadcast
 
 
 def feed_handlers(database, table, change):

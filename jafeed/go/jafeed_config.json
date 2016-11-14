@@ -1,0 +1,12 @@
+{
+	"centrifugo_secret_key":"560489a2-03af-419b-876c-57d02528269a",
+	"centrifugo_host":"localhost",
+	"centrifugo_port":"8001",
+	"rethinkdb_host":"192.168.1.15",
+	"rethinkdb_port":"28015",
+	"database":"jafeed",
+	"table":"feeds",
+	"rethinkdb_user":"admin",
+	"rethinkdb_password":"rdbadm",
+	"frequency":15
+}

@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/mmcdole/gofeed"
 	"log"
-	r "gopkg.in/dancannon/gorethink.v2"
 	"crypto/md5"
 	"encoding/hex"
 	"net/http"
@@ -12,9 +10,10 @@ import (
 	"bufio"
 	"os"
 	"time"
+	r "gopkg.in/dancannon/gorethink.v2"
+	"github.com/spf13/viper"
+	"github.com/mmcdole/gofeed"
 )
-
-
 
 type FeedEntry struct {
 	Id string `gorethink:"id,omitempty"`
@@ -35,6 +34,38 @@ func getdomain() string {
 		domain = scanner.Text()	
 	}
 	return domain
+}
+
+func getConf() map[string]interface{} {
+	viper.SetConfigName("jafeed_config")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("./etc/jafeed")
+	viper.AddConfigPath("$HOME/.jafeed")
+	viper.SetDefault("centrifugo_host", "localhost")
+	viper.SetDefault("centrifugo_port", 8001)
+	viper.SetDefault("rethinkdb_host", "localhost")
+	viper.SetDefault("rethinkdb_port", 28015)
+	viper.SetDefault("rethinkdb_user", "admin")
+	viper.SetDefault("rethinkdb_password", "")
+	viper.SetDefault("database", "jafeed")
+	viper.SetDefault("table", "feeds")
+	viper.SetDefault("frequency", 15)
+	err := viper.ReadInConfig()
+	if err != nil {
+	    panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
+	conf := make(map[string]interface{})
+	conf["centrifugo_host"] = viper.Get("centrifugo_host")
+	conf["centrifugo_port"] = viper.Get("centrifugo_port")
+	conf["centrifugo_secret_key"] = viper.Get("centrifugo_secret_key")
+	conf["rethinkdb_host"] = viper.Get("rethinkdb_host")
+	conf["rethinkdb_port"] = viper.Get("rethinkdb_port")
+	conf["rethinkdb_user"] = viper.Get("rethinkdb_user")
+	conf["rethinkdb_password"] = viper.Get("rethinkdb_password")
+	conf["database"] = viper.Get("database")
+	conf["table"] = viper.Get("table")
+	conf["frequency"] = viper.GetInt("frequency")
+	return conf
 }
 
 func geturls() []string {
@@ -63,19 +94,36 @@ func parsefeed(feedurl string) *gofeed.Feed {
 }
 
 func Connect() (*r.Session) {
+	conf := getConf()
+	host := conf["rethinkdb_host"].(string)
+	port := conf["rethinkdb_port"].(string)
+	db := conf["database"].(string)
+	user := conf["rethinkdb_user"].(string)
+	pwd := conf["rethinkdb_password"].(string)
+	addr := host+":"+port
 	// connect to Rethinkdb
 	session, err := r.Connect(r.ConnectOpts{
-		Address: "localhost:28015",
-		Database: "jafeed",
+		Address: addr,
+		Database: db,
+		Username: user,
+		Password: pwd,
 	})
     if err != nil {
         log.Fatalln(err.Error())
     }
     return session
 }
-
-func parseitems(feed *gofeed.Feed, items []*gofeed.Item, c chan string) string {
+/*
+TODO: send info over websocket
+func broadcast(conf map[string]interface{}, channel string, message string, c chan string) {
+	secret := conf["centrifugo_secret_key"].(string)
+	host := conf["centrifugo_host"].(string)
+	port := conf["centrifugo_port"].(string)
+}
+*/
+func parseitems(feed *gofeed.Feed, items []*gofeed.Item, c chan string, conf map[string]interface{}) string {
 	conn := Connect()
+	table := conf["table"].(string)
 	var allitems []*FeedEntry
 	for _, item := range items {
 		feeddata := new(FeedEntry)
@@ -94,7 +142,7 @@ func parseitems(feed *gofeed.Feed, items []*gofeed.Item, c chan string) string {
 		allitems = append(allitems, feeddata)
 	}
 	// fire the write query into Rethinkdb
-	changes, err := r.Table("feeds").Insert(allitems, r.InsertOpts{Conflict: "update"}).RunWrite(conn)
+	changes, err := r.Table(table).Insert(allitems, r.InsertOpts{Conflict: "update"}).RunWrite(conn)
 	var output string
 	if err != nil {
 		log.Fatal(err)
@@ -109,6 +157,7 @@ func parseitems(feed *gofeed.Feed, items []*gofeed.Item, c chan string) string {
 	
 func main() {
 	urls := geturls()
+	conf := getConf()
 	c := make(chan string)
 	for _, url := range urls {
 		txt := fmt.Sprintf("Parsing feed %s", url)
@@ -116,7 +165,7 @@ func main() {
 		feed := parsefeed(url)
 		fmt.Println(feed.Title)
 		items := feed.Items
-		go parseitems(feed, items, c)
+		go parseitems(feed, items, c, conf)
 		output := <- c
 		fmt.Println(output)
 	}
